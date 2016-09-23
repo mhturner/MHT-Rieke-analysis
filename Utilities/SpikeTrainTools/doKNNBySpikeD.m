@@ -1,9 +1,10 @@
 function res = doKNNBySpikeD(inputObservations,NumNeighbors,q_cost)
-% inputObservations is a cell array full of binary spike train matrices
-% each entry (matrix) comes from a
-% different category - each row of matrix is a different trial
-% NumNeighbors (k)
-% q_cost for spikeD metric
+% res = doKNNBySpikeD(inputObservations,NumNeighbors,q_cost)
+    % inputObservations is a cell array full of binary spike train matrices
+    % each entry (matrix) comes from a
+    % different category - each row of matrix is a different trial
+    % NumNeighbors (k)
+    % q_cost for spikeD metric
 
     numCats = length(inputObservations);
     
@@ -43,7 +44,6 @@ function res = doKNNBySpikeD(inputObservations,NumNeighbors,q_cost)
         end
     end
 
-
     pCorrects = zeros(1,noIterations);
     for ii = 1:noIterations
         Y = categories;
@@ -53,12 +53,10 @@ function res = doKNNBySpikeD(inputObservations,NumNeighbors,q_cost)
 
         distances = distanceMatrix + eye(size(distanceMatrix))*100*max(distanceMatrix(:));% -- make the "self distance" big;
 
-        [ordered_lists labels] = sort(distances); %now it's the (:,i) distances are distances from stuff to point i...
+        [~, labels] = sort(distances); %now it's the (:,i) distances are distances from stuff to point i...
         topys = Y(labels(1:NumNeighbors,:)); %n-neighbors (row) categories for each point (col)
         predicted = mode(topys,1); %predicted for each point
         newPCorr = sum(predicted==Y)/length(Y); %correct
         pCorrects(ii) = newPCorr;
     end
     res.pCorrect = mean(pCorrects);
-
-

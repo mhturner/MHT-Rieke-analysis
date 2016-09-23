@@ -1,4 +1,4 @@
-function [V_trace spCt] = LIFmodelG(Gexc,Ginh,Gleak,samplerate,params,window) 
+function [V_trace, spCt] = LIFmodelG(Gexc,Ginh,Gleak,samplerate,params,window) 
 
 %implements a leaky intgrate and fire model, input Gexc and Ginh should be in rows,
 %Gleak should be a constant, samplerate should be in Hz
@@ -41,7 +41,7 @@ spCt = zeros(1,size(Gexc,1));
 for trial = 1:size(Gexc,1) ; % for each exc trace
 
 % reset variables to go for trial
-V_trace(trial,:) = time ; 
+V_trace(trial,:) = time ;  %#ok<*AGROW>
 V_trace(trial,1) = V_rest ;
 I_syn = time ;
 I_syn(1) = 0;
@@ -67,7 +67,7 @@ if V_trace(trial,t)>V_thr(trial,t)
         spCt(trial) = spCt(trial) + 1;
     end
 V_trace(trial,t) = 50 ;
-V_thr(trial,[t:end]) = V_thr(trial,[t:end]) + exp([0:length(V_thr)-t]./(samplerate*-V_relref_tau))*V_relref_amp ; % add on relative refractory period
+V_thr(trial,t:end) = V_thr(trial,t:end) + exp((0:length(V_thr)-t)./(samplerate*-V_relref_tau))*V_relref_amp ; % add on relative refractory period
 ref = abs_ref ;
 end
 

@@ -1,4 +1,5 @@
 function [LinearFilter] = LinFilterFinder(signal,response, samplerate, freqcutoff)
+% [LinearFilter] = LinFilterFinder(signal,response, samplerate, freqcutoff)
 
 % this function will find the linear filter that changes row vector "signal" 
 % into a set of "responses" in rows.  "samplerate" and "freqcuttoff" 

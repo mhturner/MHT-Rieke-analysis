@@ -1,4 +1,6 @@
 function [n,binMean,binSTD,binID] = histcounts_equallyPopulatedBins(inputX,numberOfBins)
+% [n,binMean,binSTD,binID] = histcounts_equallyPopulatedBins(inputX,numberOfBins)
+
     [sortedValues, sortedInd] = sort(inputX);
     nPerBin = round(numel(inputX) / numberOfBins);
     n = zeros(1,numberOfBins);

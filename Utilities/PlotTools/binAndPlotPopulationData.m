@@ -1,4 +1,6 @@
 function binAndPlotPopulationData(allX, allY, binning, figureHandle)
+    % binAndPlotPopulationData(allX, allY, binning, figureHandle)
+    % Binning is either a) number of bins or b) defined bin edges
 if length(binning) > 1
     binEdges = binning;
     noBins = length(binEdges) - 1;

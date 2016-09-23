@@ -1,9 +1,10 @@
 function res = fitCRF_sigmoid(contrast,response,params0)
-
+    % res = fitCRF_sigmoid(contrast,response,params0)
+    % Fitting wrapper for sigmoidCRF
 
     LB = [0, -Inf 0 -Inf]; UB = [Inf Inf Inf Inf];
     fitOptions = optimset('MaxIter',1500,'MaxFunEvals',600*length(LB),'Display','off');
-    [params, resnorm, residual]=lsqnonlin(@CRF_err,params0,LB,UB,fitOptions,contrast,response);
+    [params, ~, ~]=lsqnonlin(@CRF_err,params0,LB,UB,fitOptions,contrast,response);
     k = params(1);
     c0 = params(2);
     amp = params(3);

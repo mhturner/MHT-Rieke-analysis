@@ -1,9 +1,10 @@
-%Pulls indices for peaks above some threshold
-%good for spikelets or intracellular spikes
-%just choose threshold high enough s.t. for each threshold crossing there's
-%only one peak
-%MHT 021614
 function res=pullPeakTimes(trace,threshold,checkDetectionFlag,searchInterval)
+% res=pullPeakTimes(trace,threshold,checkDetectionFlag,searchInterval)
+    %Pulls indices for peaks above some threshold
+    %good for spikelets or intracellular spikes
+    %just choose threshold high enough s.t. for each threshold crossing there's
+    %only one peak
+    %MHT 021614
     spikesUp=getThresCross(trace,threshold,1);
     inds = [];
     for ss = 1:length(spikesUp)
@@ -15,7 +16,7 @@ function res=pullPeakTimes(trace,threshold,checkDetectionFlag,searchInterval)
         end
         
         spikeDown = spikesUp(ss)+newDowns(1);
-        [val ind] = max(trace((spikesUp(ss)+1):spikeDown));
+        [~, ind] = max(trace((spikesUp(ss)+1):spikeDown));
         inds = cat(2,inds,spikesUp(ss) + ind);
     end
     

@@ -1,9 +1,10 @@
 function res = fitCRF_cumGauss(contrast,response,params0)
-
+    % res = fitCRF_cumGauss(contrast,response,params0)
+    % Fitting wrapper for CRFcumGauss
 
     LB = [0, -Inf, -Inf, -Inf]; UB = [Inf Inf Inf Inf];
     fitOptions = optimset('MaxIter',1500,'MaxFunEvals',1000*length(LB),'Display','off');
-    [params, resnorm, residual]=lsqnonlin(@CRF_err,params0,LB,UB,fitOptions,contrast,response);
+    [params, ~, ~]=lsqnonlin(@CRF_err,params0,LB,UB,fitOptions,contrast,response);
     alphaScale = params(1);
     betaSens = params(2);
     gammaXoff = params(3);

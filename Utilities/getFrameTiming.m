@@ -1,4 +1,5 @@
 function [frameTimes, frameRate] = getFrameTiming(frameMonitor,lcrFlag)
+% [frameTimes, frameRate] = getFrameTiming(frameMonitor,lcrFlag)
     %frameTimes in data points
     %frameRate, mean over all flips, is frames/dataPoint
     %MHT 3/31/16 ported over to symphony 2.0 and split lcr from oled

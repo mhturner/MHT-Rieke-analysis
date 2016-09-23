@@ -1,10 +1,11 @@
 function res = getPSTH(spikeTrials,binSize,binaryFlag)
-%spikeTrials is a n * d matrix of cell-attached spike recordings
-%    where d=number data points per trial and n is no trials
-%binsize (in data points) = 0 => use optimal bin size
-%   per Shimazaki & Shinomoto Neural Computation (2007)
-% binaryFlag = 1 for input that is a binary string of spike times
-[n d]=size(spikeTrials);
+% res = getPSTH(spikeTrials,binSize,binaryFlag)
+    %spikeTrials is a n * d matrix of cell-attached spike recordings
+    %    where d=number data points per trial and n is no trials
+    %binsize (in data points) = 0 => use optimal bin size
+    %   per Shimazaki & Shinomoto Neural Computation (2007)
+    % binaryFlag = 1 for input that is a binary string of spike times
+[n, d]=size(spikeTrials);
 
 if binaryFlag %input is binary matrix of spike times
     pointSumSpikes=sum(spikeTrials);
@@ -19,7 +20,6 @@ else
     pointSumSpikes=sum(binarySpikes);
     
 end
-
 
 %optimize bin size. fminsearch gets stuck on these bumpy empirical cost
 %functions. Dumb search works OK
@@ -48,7 +48,6 @@ spikeSTD=std(binSpikes,[],1);
 spikeSEM=spikeSTD./sqrt(n);
 
 binSpikes=mean(binSpikes,1); %average over trials
-
 
 res.binCenters = binCenters; %data points
 res.spikeCounts = binSpikes; %mean per bin

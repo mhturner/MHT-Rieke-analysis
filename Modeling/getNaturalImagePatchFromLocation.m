@@ -10,7 +10,7 @@ function res = getNaturalImagePatchFromLocation(patchLocations,imageName,varargi
     patchLocations = ip.Results.patchLocations;
     imageName = ip.Results.imageName;
     imageSize = ip.Results.imageSize;
-    stimSet = ip.Results.stimSet;    
+    stimSet = ip.Results.stimSet;
 
     %load appropriate image...
     resourcesDir = '~/Documents/MATLAB/turner-package/resources';

@@ -1,21 +1,22 @@
 function results = SpikeDetector(D,checkDetectionFlag,epochNo,specialFlag)
-% MHT last updated 1/28/15
-%   Took out some extraneous stuff
-%   Replaced old high pass filter with Debauchies(4) HP filter
-%   Now Kmeans clustering on 3 variables: peak height, and
-%   two rebound depths: one to the left and one to the right of
-%   peak. Search window = searchInterval
-%   Input
-%     -D = Response traces in matrix size [trials, epochLength]
-%   Optional parameters...
-%     -checkDetectionFlag == 1 will plot some clustering stuff to check
-%     detection
-%     -epochNo = for checkDetection figs
-%     -specialFlag usually for traces with 2 cells. give target
-%   spike direction 'upward' or 'downward' and don't use rebounds
-%   for clustering, just peak amps
-% Output: S.sp = spike times, .spikeAmps, and .violation_ind = refractory
-% violations associated with S.sp
+% results = SpikeDetector(D,checkDetectionFlag,epochNo,specialFlag)
+    % MHT last updated 1/28/15
+    %   Took out some extraneous stuff
+    %   Replaced old high pass filter with Debauchies(4) HP filter
+    %   Now Kmeans clustering on 3 variables: peak height, and
+    %   two rebound depths: one to the left and one to the right of
+    %   peak. Search window = searchInterval
+    %   Input
+    %     -D = Response traces in matrix size [trials, epochLength]
+    %   Optional parameters...
+    %     -checkDetectionFlag == 1 will plot some clustering stuff to check
+    %     detection
+    %     -epochNo = for checkDetection figs
+    %     -specialFlag usually for traces with 2 cells. give target
+    %   spike direction 'upward' or 'downward' and don't use rebounds
+    %   for clustering, just peak amps
+    % Output: S.sp = spike times, .spikeAmps, and .violation_ind = refractory
+    % violations associated with S.sp
 
 if nargin < 2
     checkDetectionFlag = 0;
@@ -41,7 +42,7 @@ results = [];
 ref_period_points = round(ref_period./SampleInterval);
 searchInterval_points = round(searchInterval./SampleInterval);
 
-[Ntraces,L] = size(D);
+[Ntraces,~] = size(D);
 Dhighpass =  DB4Filter(D,6);
 
 sp = cell(Ntraces,1);
@@ -69,8 +70,8 @@ for i=1:Ntraces
     %remove single sample peaks
     trace_res_even = trace(2:2:end);
     trace_res_odd = trace(1:2:end);
-    [null,peak_times_res_even] = getPeaks(trace_res_even,-1);
-    [null,peak_times_res_odd] = getPeaks(trace_res_odd,-1);
+    [~,peak_times_res_even] = getPeaks(trace_res_even,-1);
+    [~,peak_times_res_odd] = getPeaks(trace_res_odd,-1);
     peak_times_res_even = peak_times_res_even*2;
     peak_times_res_odd = 2*peak_times_res_odd-1;
     peak_times = intersect(peak_times,[peak_times_res_even,peak_times_res_odd]);
@@ -81,7 +82,7 @@ for i=1:Ntraces
     peakAmps = abs(peaks);
     
     if or(strcmp(specialFlag,'downward'),strcmp(specialFlag,'upward')) %don't use rebounds to cluster
-        spikeData = [peakAmps'];
+        spikeData = peakAmps';
         startMat = [median(peakAmps);...
             max(peakAmps)];
     else
@@ -99,7 +100,7 @@ for i=1:Ntraces
             [Ind,centroid_amps] = kmeans(spikeData,2,'start','sample','Options',options);
         end
     end
-    [m,m_ind] = max(centroid_amps(:,1)); %find cluster with largest peak amplitude
+    [~,m_ind] = max(centroid_amps(:,1)); %find cluster with largest peak amplitude
     n_ind = find(~([1 2]==m_ind)); %nonspike cluster index
     spike_ind_log = (Ind==m_ind); %spike_ind_log is logical, length of peaks
     

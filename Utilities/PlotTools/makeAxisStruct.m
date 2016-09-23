@@ -1,4 +1,4 @@
-function [] = makeAxisStruct(ax, fname,varargin)
+function [] = makeAxisStruct(ax, fname, varargin)
 disp(fname);
 basedir = '~/Dropbox/MyStuff/Matlab2Igor/FigFiles/';
 if ~isempty(varargin)
@@ -29,12 +29,12 @@ for i=1:length(plotLines)
     if isempty(displayName)
         i_string = num2str(i); 
         switch length(i_string)
-            case 1, i_string = ['00',i_string];
+            case 1, i_string = ['00',i_string]; %#ok<*AGROW>
             case 2, i_string = ['0',i_string];
             otherwise
         end
         line_prefix = ['L', i_string];
-    elseif ~isempty(str2num(displayName(1)))
+    elseif ~isempty(str2num(displayName(1))) %#ok<ST2NM>
         line_prefix = ['n' displayName];
     else line_prefix = displayName; 
     end
@@ -63,12 +63,7 @@ for i=1:length(plotLines)
     s.([line_prefix '_Y']) = get(curLine,'YData');
     X = get(curLine,'XData');
     if length(X)>500 % X is likely to be a time series
-        %if max(diff(diff(X))) == 0 %linear X scale
-        %    s.([line_prefix '_start']) = X(1);
-        %    s.([line_prefix '_delta']) = X(2) - X(1);
-        %else %separate X wave
-            s.([line_prefix '_X']) = X;
-        %end
+        s.([line_prefix '_X']) = X;
     else
         s.([line_prefix '_X']) = X;
     end
@@ -119,7 +114,6 @@ for i=1:length(plotLines)
         s.([line_prefix '_markerSize']) = get(curLine,'markersize');
     end
     if isfield(s,[line_prefix '_marker']) && ~isfield(s,[line_prefix '_markercolor'])
-%         s.([line_prefix '_markercolor']) = [0 0 0];
         s.([line_prefix '_markercolor']) = get(curLine,'Color');
     end
     %error bars?

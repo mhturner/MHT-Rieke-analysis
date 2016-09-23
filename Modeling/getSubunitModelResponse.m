@@ -6,8 +6,6 @@ function res = getSubunitModelResponse(stimulusCell,imageMean,varargin)
     addParameter(ip,'contrastPolarity', 1, @(x) ismember(x,[-1, 1])); %+/- 1
     addParameter(ip,'subunitSigma', 12, @isnumeric); %microns
     addParameter(ip,'centerSigma', 40, @isnumeric); %microns
-    % Still need to incorporate this:
-% %     addParameter(ip,'apertureDiameter', 200, @isnumeric); %microns.
     addParameter(ip,'pixelScaleFactor', 3.3, @isnumeric); %microns per pixel of image in stimulusCell
     
 
@@ -19,7 +17,6 @@ function res = getSubunitModelResponse(stimulusCell,imageMean,varargin)
     %convert from microns to pixels:
     subunitSigma = round(ip.Results.subunitSigma ./ pixelScaleFactor);
     centerSigma = round(ip.Results.centerSigma ./ pixelScaleFactor);
-% %     apertureDiameter = round(ip.Results.apertureDiameter ./ pixelScaleFactor);
     
     FilterSize = size(stimulusCell{1},1);
               

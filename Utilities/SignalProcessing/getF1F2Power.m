@@ -1,4 +1,6 @@
 function res = getF1F2Power(signal,modulationFrequency,samplingRate,plotFigNumber)
+    % res = getF1F2Power(signal,modulationFrequency,samplingRate,plotFigNumber)
+
     if nargin<2
        error('Needs signal and modulation frequency') 
     elseif nargin<3
@@ -20,8 +22,8 @@ function res = getF1F2Power(signal,modulationFrequency,samplingRate,plotFigNumbe
     f = fs(n/2+1:end);
     X = 2.*abs(spec(n/2+1:end)); %amplitude spectrum, double b/c of symmetry about zero
 
-    [val F1ind] = min(abs(f-modulationFrequency));
-    [val F2ind] = min(abs(f-2*modulationFrequency));
+    [~, F1ind] = min(abs(f-modulationFrequency));
+    [~, F2ind] = min(abs(f-2*modulationFrequency));
     
     F1amplitude = X(F1ind); %fourier amplitude: pA or spikes/sec
     F2amplitude = X(F2ind);
@@ -47,6 +49,4 @@ function res = getF1F2Power(signal,modulationFrequency,samplingRate,plotFigNumbe
 
     res.F1power = F1power;
     res.F2power = F2power;
-
-
 end

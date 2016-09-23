@@ -1,9 +1,10 @@
 function res = fitSpikeInputOutput(inputs,response,params0)
-
+    % res = fitSpikeInputOutput(inputs,response,params0)
+    % Fitting wrapper for SpikeOutput_cumGauss
 
     LB = [0, -Inf, -Inf]; UB = [Inf Inf Inf];
     fitOptions = optimset('MaxIter',1500,'MaxFunEvals',600*length(LB));
-    [params, resnorm, residual]=lsqnonlin(@CRF_err,params0,LB,UB,fitOptions,inputs,response);
+    [params, ~, ~]=lsqnonlin(@errFun,params0,LB,UB,fitOptions,inputs,response);
     alphaScale = params(1);
     betaSens = params(2);
     gammaXoff = params(3);
@@ -19,8 +20,8 @@ function res = fitSpikeInputOutput(inputs,response,params0)
     res.rSquared=rSquared;
 end
 
-function err = CRF_err(params,inputs,response)
-    %error fxn for fitting CRF fxn with contrast spots...
+function err = errFun(params,inputs,response)
+    %error fxn
     alphaScale = params(1);
     betaSens = params(2);
     gammaXoff = params(3);

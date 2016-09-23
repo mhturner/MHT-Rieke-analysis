@@ -11,6 +11,5 @@ function s = mergeStruct(A, B)
 	f = fieldnames(B);
 	for i = 1:length(f)
 		s.(f{i}) = B.(f{i});
-% 		s=setfield(A, f{i}, getfield(B, f{i}));
 	end
 end

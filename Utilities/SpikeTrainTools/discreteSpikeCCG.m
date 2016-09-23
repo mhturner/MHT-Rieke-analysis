@@ -7,7 +7,6 @@ function res = discreteSpikeCCG(spikeTimes1, spikeTimes2, totalBinaryLength, win
     %       represent all the spike times
     % MHT 7/29/13
     
-    
     ACGhist1 = zeros(1,2*window+1);
     ACGhist2 = zeros(1,2*window+1);
     CCGhist = zeros(1,2*window+1);
@@ -15,12 +14,12 @@ function res = discreteSpikeCCG(spikeTimes1, spikeTimes2, totalBinaryLength, win
         referenceTime = spikeTimes1(i);
         if referenceTime > window && referenceTime < totalBinaryLength - window
             %CCG
-            refereeTimeInds=find(abs(spikeTimes2-referenceTime)<window);
+            refereeTimeInds= abs(spikeTimes2-referenceTime)<window;
             refereeTimes=spikeTimes2(refereeTimeInds); %spike 2 times within window of current spike1 time
             refereeTimes=refereeTimes-referenceTime+window; %shift times to align with window
             CCGhist(refereeTimes)=CCGhist(refereeTimes)+1;
             %ACG1
-            refereeTimeInds=find(abs(spikeTimes1-referenceTime)<window);
+            refereeTimeInds= abs(spikeTimes1-referenceTime)<window;
             refereeTimes=spikeTimes1(refereeTimeInds); %spike 1 times within window of current spike1 time
             refereeTimes=refereeTimes-referenceTime+window; %shift times to align with window
             ACGhist1(refereeTimes)=ACGhist1(refereeTimes)+1;
@@ -31,17 +30,13 @@ function res = discreteSpikeCCG(spikeTimes1, spikeTimes2, totalBinaryLength, win
         referenceTime = spikeTimes2(i);
         if referenceTime > window && referenceTime < totalBinaryLength - window
             %ACG2
-            refereeTimeInds=find(abs(spikeTimes2-referenceTime)<window);
+            refereeTimeInds= abs(spikeTimes2-referenceTime)<window;
             refereeTimes=spikeTimes2(refereeTimeInds); %spike 2 times within window of current spike2 time
             refereeTimes=refereeTimes-referenceTime+window; %shift times to align with window
             ACGhist2(refereeTimes)=ACGhist2(refereeTimes)+1;
         end
     end
-%     res.CCG=CCGhist;
-%     res.ACG1=ACGhist1;
-%     res.ACG2=ACGhist2;
-    
-    
+
     %normalize CCG by geometric mean of autocorrelations
     res.CCG=CCGhist./sqrt(max(ACGhist1)*max(ACGhist2));
     res.ACG1=ACGhist1./max(ACGhist1);
