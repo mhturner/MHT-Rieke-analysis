@@ -7,5 +7,3 @@ Some of this code began as common Rieke lab analysis code (e.g. the EpochTreeGUI
 
 My Symphony protocol package can be found at:
 https://github.com/Rieke-Lab/turner-package
-
--Max Turner
