@@ -56,21 +56,18 @@ function response = getCycleAverageResponse(epochList,recordingType)
         stimStart = frameTimes(preFrames + 1); %first flip into stim frames
         
         if strcmp(recordingType,'extracellular')
-            checkDetectionFlag = 0; %will throw figures
-            specialFlag = []; %wonky spikes option
-            SpikeStruct = SpikeDetector(currentData,checkDetectionFlag,e,specialFlag);
+            [SpikeTimes, ~, ~] = ...
+                SpikeDetector(currentData);
             spikeBinary = zeros(size(currentData));
-            spikeBinary(SpikeStruct.sp) = 1;
+            spikeBinary(SpikeTimes) = 1;
             epochResponse = spikeBinary;
             response.units = 'Spikes/sec';
             
         elseif strcmp(recordingType, 'iClamp, spikes')
-            threshold = -20; %mV
-            checkDetectionFlag = 0; %will throw figures
-            searchInterval = 1.5; %msec, how long to look for repolarization?
-            SpikeStruct = CurrentClampSpikeDetector(currentData,threshold,checkDetectionFlag,(searchInterval / 1e3) * sampleRate);
+            [SpikeTimes, ~]...
+                = CurrentClampSpikeDetector(currentData,'Threshold',-20);
             spikeBinary = zeros(size(currentData));
-            spikeBinary(SpikeStruct.sp) = 1;
+            spikeBinary(SpikeTimes) = 1;
             epochResponse = spikeBinary;
             response.units = 'Spikes/sec';
             

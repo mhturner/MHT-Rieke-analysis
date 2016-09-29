@@ -37,19 +37,16 @@ function response = getResponseAmplitudeStats(epochList,recordingType)
     dataMatrix = riekesuite.getResponseMatrix(epochList,amp);
     response.n = size(dataMatrix,1);
     if strcmp(recordingType, 'extracellular')
-        checkDetectionFlag = 0; %will throw figures
-        epochNo = 0; %for warnings display purposes
-        specialFlag = []; %wonky spikes option
-        SpikeStruct = SpikeDetector(dataMatrix,checkDetectionFlag,epochNo,specialFlag);
+        [SpikeTimes, ~, ~] = ...
+                SpikeDetector(currentData);
         spikeBinary = zeros(size(dataMatrix));
         if (response.n == 1) %single trial
-            spikeBinary(SpikeStruct.sp) = 1;
+            spikeBinary(SpikeTimes) = 1;
             PSTH = sampleRate*conv(spikeBinary,newFilt.amp,'same');
         else %multiple trials
             PSTH = zeros(size(dataMatrix));
             for ss = 1:size(spikeBinary,1)
-                SpikeStruct.sp{ss}(SpikeStruct.violation_ind{ss}) = []; %remove refractory violations
-                spikeBinary(ss,SpikeStruct.sp{ss}) = 1;
+                spikeBinary(ss,SpikeTimes{ss}) = 1;
                 PSTH(ss,:) =  sampleRate*conv(spikeBinary(ss,:),newFilt.amp,'same');
             end
         end
@@ -70,14 +67,12 @@ function response = getResponseAmplitudeStats(epochList,recordingType)
         response.integrated.units = 'Spikes';
 
     elseif strcmp(recordingType,'iClamp, spikes')
-        threshold = -20; %mV
-        checkDetectionFlag = 0; %will throw figures
-        searchInterval = 1.5; %msec, how long to look for repolarization?
-        SpikeStruct = CurrentClampSpikeDetector(dataMatrix,threshold,checkDetectionFlag,(searchInterval / 1e3) * sampleRate);
+        [SpikeTimes, ~]...
+                = CurrentClampSpikeDetector(currentData,'Threshold',-20);
         spikeBinary = zeros(size(dataMatrix));
         PSTH = zeros(size(dataMatrix));
         for ss = 1:size(spikeBinary,1)
-            spikeBinary(ss,SpikeStruct.sp{ss}) = 1;
+            spikeBinary(ss,SpikeTimes{ss}) = 1;
             PSTH(ss,:) =  sampleRate*conv(spikeBinary(ss,:),newFilt.amp,'same');
         end
         peaks = getPosNegPeaks(PSTH);

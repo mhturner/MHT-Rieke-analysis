@@ -42,19 +42,15 @@ function res = getLinearFilterAndPrediction(epochList,recordingType,varargin)
         currentData = (riekesuite.getResponseVector(currentEpoch,amp))';
         %process traces
         if strcmp(recordingType, 'extracellular')
-            checkDetectionFlag = 0; %will throw figures
-            epochNo = 0; %for warnings display purposes
-            specialFlag = []; %wonky spikes option
-            SpikeStruct = SpikeDetector(currentData,checkDetectionFlag,epochNo,specialFlag);
+            [SpikeTimes, ~, ~] = ...
+                SpikeDetector(currentData);
             currentResponse = zeros(size(currentData));
-            currentResponse(SpikeStruct.sp) = 1; %spike binary train
+            currentResponse(SpikeTimes) = 1; %spike binary train
         elseif strcmp(recordingType,'iClamp, spikes')
-            threshold = -20; %mV
-            checkDetectionFlag = 0; %will throw figures
-            searchInterval = 1.5; %msec, how long to look for repolarization?
-            SpikeStruct = CurrentClampSpikeDetector(currentData,threshold,checkDetectionFlag,(searchInterval / 1e3) * sampleRate);
+            [SpikeTimes, ~]...
+                = CurrentClampSpikeDetector(currentData,'Threshold',-20);
             currentResponse = zeros(size(currentData));
-            currentResponse(SpikeStruct.sp) = 1; %spike binary train
+            currentResponse(SpikeTimes) = 1; %spike binary train
         elseif strcmp(recordingType,'iClamp, subthreshold')
             %median filter (width 5 msec) to remove spikes
             currentResponse = medfilt1(currentData,(5 / 1e3) * sampleRate,[],2);
