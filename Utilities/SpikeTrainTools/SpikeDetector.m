@@ -35,9 +35,10 @@ SampleRate = ip.Results.SampleRate;
 RefractoryPeriod = ip.Results.RefractoryPeriod * SampleRate; % datapoints
 SearchWindow = ip.Results.SearchWindow * SampleRate; % datapoints
 
-nTraces = size(DataMatrix,1);
-DataMatrix =  DB4Filter(DataMatrix,6);
+CutoffFrequency = 500; %Hz
+DataMatrix = highPassFilter(DataMatrix,CutoffFrequency,1/SampleRate);
 
+nTraces = size(DataMatrix,1);
 SpikeTimes = cell(nTraces,1);
 SpikeAmplitudes = cell(nTraces,1);
 RefractoryViolations = cell(nTraces,1);
