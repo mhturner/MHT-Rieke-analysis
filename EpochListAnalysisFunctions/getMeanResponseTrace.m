@@ -1,5 +1,5 @@
-function response = getMeanResponseTrace(epochList,recordingType)
-    % USAGE: trace = getMeanResponseTrace(epochList,recordingType)
+function response = getMeanResponseTrace(epochList,recordingType,varargin)
+    % USAGE: trace = getMeanResponseTrace(epochList,recordingType,varargin)
     % -epochList is a riekesuite epoch list
     % -recordingType is: 'extracellular' (default) - PSTH
     %                   'iClamp, spikes' - PSTH
@@ -13,16 +13,18 @@ function response = getMeanResponseTrace(epochList,recordingType)
     ip = inputParser;
     ip.addRequired('epochList',@(x)isa(x,'edu.washington.rieke.symphony.generic.GenericEpochList'));
     ip.addRequired('recordingType',@ischar);
-    ip.parse(epochList,recordingType);
+    addParameter(ip,'PSTHsigma',5,@isnumeric); %msec
+    ip.parse(epochList,recordingType,varargin{:});
     epochList = ip.Results.epochList;
     recordingType = ip.Results.recordingType;
+    PSTHsigma = ip.Results.PSTHsigma;
 
     sampleRate = epochList.firstValue.protocolSettings('sampleRate'); %Hz
     baselineTime = epochList.firstValue.protocolSettings('preTime'); %msec
     baselinePoints = (baselineTime / 1e3) * sampleRate; %msec -> datapoints
     
     %for smoothed PSTH...
-    filterSigma = (5 / 1e3) * sampleRate; %5 msec -> datapoints
+    filterSigma = (PSTHsigma / 1e3) * sampleRate; %msec -> datapoints
     newFilt = gaussFilter1D(filterSigma);
     
     amp = epochList.firstValue.protocolSettings('amp');
@@ -31,7 +33,7 @@ function response = getMeanResponseTrace(epochList,recordingType)
     response.timeVector = (1:size(dataMatrix,2))./ sampleRate;
     if strcmp(recordingType, 'extracellular')
         [SpikeTimes, ~, ~] = ...
-                SpikeDetector(currentData);
+                SpikeDetector(dataMatrix);
         spikeBinary = zeros(size(dataMatrix));
         if (response.n == 1) %single trial
             spikeBinary(SpikeTimes) = 1;
@@ -39,7 +41,7 @@ function response = getMeanResponseTrace(epochList,recordingType)
         else %multiple trials
             PSTH = zeros(size(dataMatrix));
             for ss = 1:size(spikeBinary,1)
-                spikeBinary(ss,SpikeTimes) = 1;
+                spikeBinary(ss,SpikeTimes{ss}) = 1;
                 PSTH(ss,:) =  sampleRate*conv(spikeBinary(ss,:),newFilt.amp,'same');
             end
         end

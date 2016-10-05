@@ -38,7 +38,7 @@ function response = getResponseAmplitudeStats(epochList,recordingType)
     response.n = size(dataMatrix,1);
     if strcmp(recordingType, 'extracellular')
         [SpikeTimes, ~, ~] = ...
-                SpikeDetector(currentData);
+                SpikeDetector(dataMatrix);
         spikeBinary = zeros(size(dataMatrix));
         if (response.n == 1) %single trial
             spikeBinary(SpikeTimes) = 1;
@@ -57,9 +57,9 @@ function response = getResponseAmplitudeStats(epochList,recordingType)
         response.peak.SEM = response.peak.stdev ./ sqrt(response.n);
         response.peak.units = 'Sp/s';
         if (response.n == 1) %single trial
-            spikeCounts = spikeCounter(SpikeStruct.sp);
+            spikeCounts = spikeCounter(SpikeTimes);
         else
-            spikeCounts = cellfun(@spikeCounter,SpikeStruct.sp);
+            spikeCounts = cellfun(@spikeCounter,SpikeTimes);
         end
         response.integrated.mean = mean(spikeCounts);
         response.integrated.stdev = std(spikeCounts);
