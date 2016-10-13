@@ -21,7 +21,7 @@ function res = getNaturalImagePatchFromLocation(patchLocations,imageName,varargi
     img = (img./max(img(:))); %rescale s.t. brightest point is maximum monitor level
     res.backgroundIntensity = mean(img(:));%set the mean to the mean over the image
     
-    imageSize_VHpix = imageSize ./ (3.3); %um / (um/pixel) -> pixel
+    imageSize_VHpix = round(imageSize ./ (3.3)); %um / (um/pixel) -> pixel
     radX = round(imageSize_VHpix(1) / 2); %boundaries for fixation draws depend on stimulus size
     radY = round(imageSize_VHpix(2) / 2);
     images = cell(1,size(patchLocations,1));
