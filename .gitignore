@@ -1,0 +1,8 @@
+# Matlab autosave files
+*.asv
+
+# OS X stores
+*.DS_Store
+
+# Big resources directory
+resources/
