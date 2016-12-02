@@ -138,10 +138,11 @@ function res = getLinearFilterAndPrediction(epochList,recordingType,varargin)
     res.nonlinearity.respErr = respErr;
 
     % fit nonlinearity
-    params0 = [0.005 20 max(binResp) 0];
-    fitRes = fitCRF_sigmoid(binMean,binResp,params0);
+    params0=[max(binResp), 0.05, 0, 0]';
+    fitRes = fitNormcdfNonlinearity(binMean,binResp,params0);
     fitXX = min(binMean - binErr): max(binMean + binErr);
-    fitYY = sigmoidCRF(fitXX,fitRes.k, fitRes.c0, fitRes.amp, fitRes.yOff);
+    fitYY = normcdfNonlinearity(fitXX,...
+        fitRes.alpha,fitRes.beta,fitRes.gamma,fitRes.epsilon);
     res.nonlinearity.fitXX = fitXX;
     res.nonlinearity.fitYY = fitYY;
     res.nonlinearity.fitParams = fitRes;
