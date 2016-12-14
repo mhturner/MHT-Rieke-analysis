@@ -165,7 +165,7 @@ classdef epochTreeGUI < handle
                 'Style',    'pushbutton', ...
                 'Units',    'normalized', ...
                 'FontSize', self.fontSize, ...
-                'String',   'clear example', ...
+                'String',   'clear examples', ...
                 'HorizontalAlignment', 'left', ...
                 'Position', [.35 0 .3 .05], ...
                 'TooltipString', 'clear all example nodes');
@@ -212,7 +212,7 @@ classdef epochTreeGUI < handle
             self.epochTree.custom.get('display').put('name', 'EpochTree');
             self.epochTree.custom.get('display').put('color', [0 0 0]);
             self.epochTree.custom.get('display').put('backgroundColor', 'none');
-            self.refreshBrowserNodes;
+            self.refreshBrowserNodes(true);
         end
         
         function marryEpochNodesToWidgets(self, epochNode, browserNode)
@@ -230,15 +230,6 @@ classdef epochTreeGUI < handle
             end
             display.color = [0 0 0];
             display.backgroundColor = 'none';
-            
-            % and optional alternate appearance
-            if epochNode.custom.containsKey('display') && epochNode.custom.containsKey('alt')
-                display.alt = epochNode.custom.display.alt;
-            else
-                display.alt.name = [];
-                display.alt.color = [];
-                display.alt.backgroundColor = [];
-            end
             epochNode.custom.put('display', riekesuite.util.toJavaMap(display));
             
             % other nodes may be Epoch capsules
@@ -274,67 +265,56 @@ classdef epochTreeGUI < handle
             end
         end
         
-        function refreshBrowserNodes(self, startNode)
+        function refreshBrowserNodes(self, updateAllNodes)
+            startNode = self.treeBrowser.graphTree.trunk;
             if nargin < 2
-                startNode = self.treeBrowser.graphTree.trunk;
+                updateAllNodes = true;
             end
             
             self.isBusy = true;
-            self.readEpochTreeNodeDisplayState(startNode);
+            self.readEpochTreeNodeDisplayState(startNode,updateAllNodes);
             self.treeBrowser.graphTree.trunk.countCheckedDescendants;
             self.treeBrowser.graphTree.draw;
             self.isBusy = false;
         end
         
-        function readEpochTreeNodeDisplayState(self, browserNode)
+        function readEpochTreeNodeDisplayState(self, browserNode, updateAllNodes)
             nodeData = browserNode.userData;
-            if ~isempty(nodeData)
-                
-                if isa(nodeData, 'edu.washington.rieke.jauimodel.AuiEpoch')
-                    % only read selection for Epoch
-                    browserNode.isChecked = nodeData.isSelected;
-                    
-                elseif isa(nodeData, 'edu.washington.rieke.jauimodel.AuiEpochTree')
-                    % read selection and apperance for EpochTree
-                    
-                    if nodeData.custom.get('isCapsule');
-                        % reconcile capsule node with encapsulated Epoch
-                        epoch = nodeData.epochList.firstValue;
-                        nodeData.custom.put('isSelected',epoch.isSelected);
-                        browserNode.isChecked = epoch.isSelected;
-                    else
-                        browserNode.isChecked =  nodeData.custom.get('isSelected');
-                    end
-                    
-                    % name
-                    if isempty(nodeData.custom.get('display').get('alt')) || nodeData.custom.get('display').get('alt').get('name').isEmpty
-                        browserNode.name = nodeData.custom.get('display').get('name');
-                        %browserNode
-                        %pause;
-                    else
-                        browserNode.name = nodeData.custom.get('display').get('alt').get('name');
-                    end
-                    
-                    % text color
-                    if isempty(nodeData.custom.get('display').get('alt')) || nodeData.custom.get('display').get('alt').get('color').isEmpty
-                        browserNode.textColor = nodeData.custom.get('display').get('color');
-                    else
-                        browserNode.textColor = nodeData.custom.get('display').get('alt').get('color');
-                    end
-                    
-                    % background color
-                    if isempty(nodeData.custom.get('display').get('alt')) || nodeData.custom.get('display').get('alt').get('backgroundColor').isEmpty
-                        browserNode.textBackgroundColor = nodeData.custom.get('display').get('backgroundColor');
-                    else
-                        browserNode.textBackgroundColor = nodeData.custom.get('display').get('alt').get('backgroundColor');
-                    end
-                    %keyboard;
+            if isa(nodeData,'edu.washington.rieke.jauimodel.AuiEpoch')
+                updateThisNode = false;
+            elseif (updateAllNodes)
+                updateThisNode = true;
+            else
+                updateThisNode = nodeData.custom.get('isToUpdate');
+            end
+            
+            if (updateThisNode)
+                nodeData.custom.put('isToUpdate',false);
+                if nodeData.custom.get('isCapsule');
+                    % reconcile capsule node with encapsulated Epoch
+                    epoch = nodeData.epochList.firstValue;
+                    nodeData.custom.put('isSelected',epoch.isSelected);
+                    browserNode.isChecked = epoch.isSelected;
+                else
+                    browserNode.isChecked =  nodeData.custom.get('isSelected');
                 end
+
+                % name
+                    browserNode.name = nodeData.custom.get('display').get('name');
+
+
+                % text color
+                    browserNode.textColor = nodeData.custom.get('display').get('color');
+
+
+                % background color
+                    browserNode.textBackgroundColor = nodeData.custom.get('display').get('backgroundColor');
+
             end
             
             % recur: set child selections
             for ii = 1:browserNode.numChildren
-                self.readEpochTreeNodeDisplayState(browserNode.getChild(ii));
+                self.readEpochTreeNodeDisplayState(browserNode.getChild(ii),updateAllNodes);
             end
         end
         
@@ -353,8 +333,9 @@ classdef epochTreeGUI < handle
                     nodes{nn}.custom.put('isExample',true);
                     nodes{nn}.custom.get('display').put('backgroundColor','r');
                 end
+                nodes{nn}.custom.put('isToUpdate',true);
             end
-            self.refreshBrowserNodes;
+            self.refreshBrowserNodes(false);
             self.isBusy = false;
         end
         
@@ -363,8 +344,9 @@ classdef epochTreeGUI < handle
             for nn = 1:self.epochTree.descendentsDepthFirst.length
                 self.epochTree.descendentsDepthFirst(nn).custom.put('isExample',false); %undo previous example settings
                 self.epochTree.descendentsDepthFirst(nn).custom.get('display').put('backgroundColor','none');
+                self.epochTree.descendentsDepthFirst(nn).custom.put('isToUpdate',true);
             end
-            self.refreshBrowserNodes;
+            self.refreshBrowserNodes(false);
             self.isBusy = false;
         end
         
@@ -443,9 +425,6 @@ classdef epochTreeGUI < handle
             display.name = browserNode.name;
             display.color = browserNode.textColor;
             display.backgroundColor = browserNode.textBackgroundColor;
-            display.alt.name = [];
-            display.alt.color = [];
-            display.alt.backgroundColor = [];
             capsuleNode.custom.put('display', riekesuite.util.toJavaMap(display));
             
             % wire capsule node to tree, but not reciprocally
