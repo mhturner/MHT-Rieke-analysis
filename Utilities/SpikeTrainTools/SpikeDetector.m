@@ -93,7 +93,7 @@ for tt=1:nTraces
         SpikeTimes{tt} = [];
         SpikeAmplitudes{tt} = []; 
         RefractoryViolations{tt} = [];
-        disp(['Trial '  num2str(tt) ': no spikes!']);
+%         disp(['Trial '  num2str(tt) ': no spikes!']);
         if (CheckDetection)
             plotClusteringData();
         end
