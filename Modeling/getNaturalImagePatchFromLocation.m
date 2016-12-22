@@ -26,8 +26,8 @@ function res = getNaturalImagePatchFromLocation(patchLocations,imageName,varargi
     radY = round(imageSize_VHpix(2) / 2);
     images = cell(1,size(patchLocations,1));
     for ff = 1:size(patchLocations,1);
-        images{ff} = img(round(patchLocations(ff,1)-radX):round(patchLocations(ff,1)+radX),...
-            round(patchLocations(ff,2)-radY):round(patchLocations(ff,2)+radY));
+        images{ff} = img(round(patchLocations(ff,1)-radX+1):round(patchLocations(ff,1)+radX),...
+            round(patchLocations(ff,2)-radY+1):round(patchLocations(ff,2)+radY));
     end
     res.images = images;
 end
