@@ -33,18 +33,19 @@ function res = getLinearFilterAndPrediction(epochList,recordingType,varargin)
     for e = 1:epochList.length
         currentEpoch = epochList.elements(e);
         % get epoch response and stimulus
-        epochRes = getNoiseStimulusAndResponse(currentEpoch,recordingType,'seedName',seedName);
-        allStimuli(e,:) = epochRes.binnedStimulus;
-        allResponses(e,:) = epochRes.binnedResponse;
-
+        epochRes = getNoiseStimulusAndResponse(currentEpoch,recordingType,...
+            'seedName',seedName,...
+            'keepExcPolarity', true,...
+            'downSampleAtNoiseRate', false);
+        allStimuli(e,:) = epochRes.stimulus;
+        allResponses(e,:) = epochRes.response;
     end
-    updateRate = epochRes.updateRate;
-    filterLen = 800; %msec, length of linear filter to compute
+    filterLen = 500; %msec, length of linear filter to compute
     %fraction of noise update rate at which to cut off filter spectrum
-    freqCutoffFraction = 1;
+    freqCutoffFraction = 0.75;
     
-    LinearFilter = LinFilterFinder(allStimuli,allResponses, updateRate, freqCutoffFraction*updateRate);
-    filterPts = (filterLen/1000)*updateRate;
+    LinearFilter = LinFilterFinder(allStimuli,allResponses, epochRes.sampleRate, freqCutoffFraction*epochRes.updateRate);
+    filterPts = (filterLen/1000)*epochRes.sampleRate;
     
     tempResp = reshape(allResponses',1,numel(allResponses));
     tempStim = reshape(allStimuli',1,numel(allStimuli));
@@ -53,10 +54,11 @@ function res = getLinearFilterAndPrediction(epochList,recordingType,varargin)
 
     res.stimulus = tempStim;
     res.LinearFilter = LinearFilter(1:filterPts);
-    res.filterTimeVector = (1:filterPts) ./ updateRate; %sec
+    res.filterTimeVector = (1:filterPts) ./ epochRes.sampleRate; %sec
     res.measuredResponse = tempResp;
     res.generatorSignal = linearPrediction;
     res.updateRate = epochRes.updateRate;
+    res.sampleRate = epochRes.sampleRate;
     
     % get nonlinearity
     [n,binMean,binSTD,binID] = histcounts_equallyPopulatedBins(res.generatorSignal,numberOfBins);
@@ -76,7 +78,10 @@ function res = getLinearFilterAndPrediction(epochList,recordingType,varargin)
     res.nonlinearity.respErr = respErr;
 
     % fit nonlinearity
-    params0=[max(binResp), 0.05, 0, 0]';
+%     params0=[max(binResp), 0.05, 0, 0]';
+    
+    params0=[3*max(binResp), 0.3, -2, -1]';
+    
     fitRes = fitNormcdfNonlinearity(binMean,binResp,params0);
     fitXX = min(binMean - binErr): max(binMean + binErr);
     fitYY = normcdfNonlinearity(fitXX,...

@@ -4,7 +4,7 @@ function res = fitNormcdfNonlinearity(x,response,params0)
 %params is [alpha, beta, gamma, epsilon]
 % % params0=[max(resp), mean(diff(resp)), 0, 0]';
 
-LB = [0 0 -Inf -Inf]; UB = [Inf Inf Inf max(response(:))];
+LB = [-Inf -Inf -Inf -Inf]; UB = [Inf Inf Inf max(response(:))];
 fitOptions = optimset('MaxIter',1500,'MaxFunEvals',600*length(LB),'Display','off');
 [params, ~, residual]=lsqnonlin(@modelErrorFxn,params0,LB,UB,fitOptions,x,response);
 ssErr=sum(residual.^2); %sum of squares of residual

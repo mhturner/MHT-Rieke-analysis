@@ -11,12 +11,12 @@ function res = fitCSModel_IndependentNL(C,S,response,params0)
 % mean(diff(z_data))/mean(diff(S)), 0, 0]';
 
 
-LB = [0 0 -Inf 0 0 -Inf -Inf];
+LB = [-Inf -Inf -Inf -Inf -Inf -Inf -Inf];
 UB = [Inf Inf Inf Inf Inf Inf Inf];
 fitOptions = optimset('MaxIter',1500,'MaxFunEvals',600*length(LB),'Display','off');
 [params, ~, residual]=lsqnonlin(@modelErrorFxn,params0,LB,UB,fitOptions,C,S,response);
 ssErr=sum(residual.^2); %sum of squares of residual
-ssTot=sum((response(:)-mean(response(:))).^2); %total sum of squares
+ssTot=nansum((response(:)-nanmean(response(:))).^2); %total sum of squares
 rSquared=1-ssErr/ssTot; %coefficient of determination
 
 res.alphaC=params(1);
@@ -43,7 +43,10 @@ epsilon = params(7);
 %reshape x,y and response to arrays
 [X1,X2] = meshgrid(x',y');
 response=reshape(response,[1, size(response,1)*size(response,2)]);
+% take out any NaNs in z data, don't fit with those points
+fitInds = find(~isnan(response));
+response = response(fitInds);
 
-fit = CSModel_IndependentNL(X1(:)',X2(:)',alphaC,betaC,gammaC,alphaS,betaS,gammaS,epsilon);
+fit = CSModel_IndependentNL(X1(fitInds),X2(fitInds),alphaC,betaC,gammaC,alphaS,betaS,gammaS,epsilon);
 err = fit - response;
 end

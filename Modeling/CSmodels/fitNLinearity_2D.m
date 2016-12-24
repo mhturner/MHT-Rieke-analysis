@@ -12,7 +12,7 @@ LB = [max(z_data(:)) min(x) min(y) 0 0 -1 -Inf]; UB = [Inf max(x) max(y) Inf Inf
 fitOptions = optimset('MaxIter',1500,'MaxFunEvals',600*length(LB),'Display','off');
 [beta, ~, residual]=lsqnonlin(@BivarCumNorm_err,beta0,LB,UB,fitOptions,x,y,z_data);
 ssErr=sum(residual.^2); %sum of squares of residual
-ssTot=sum((z_data(:)-mean(z_data(:))).^2); %total sum of squares
+ssTot=nansum((z_data(:)-nanmean(z_data(:))).^2); %total sum of squares
 rSquared=1-ssErr/ssTot; %coefficient of determination
 
 res.alpha=beta(1);
@@ -35,8 +35,11 @@ sigma=[sigma1^2 corr12*sigma1*sigma2;corr12*sigma1*sigma2 sigma2^2];
 %reshape x,y and response to arrays
 [X1,X2] = meshgrid(x',y');
 response=reshape(response,[size(response,1)*size(response,2),1]);
+% take out any NaNs in z data, don't fit with those points
+fitInds = find(~isnan(response));
+response = response(fitInds);
 
-fit = JointNLin_mvcn(X1(:)',X2(:)',alpha,mu,sigma,epsilon);
+fit = JointNLin_mvcn(X1(fitInds)',X2(fitInds)',alpha,mu,sigma,epsilon);
 
 err = fit - response;
 end
