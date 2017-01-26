@@ -15,11 +15,18 @@ function [SpikeTimes, SpikeAmplitudes, RefractoryViolations] = SpikeDetector(Dat
 %       RefractoryPeriod: (1.5e-3) (sec)
 %       SearchWindow; (1.2e-3) (sec) To look for rebounds. Search interval 
 %           is (peak time +/- SearchWindow/2)
+%       RemoveRefractoryViolations: (true) (logical) removes refractory violations from
+%       spike times and spike amplitudes
+%       thresholdSpikeFactor: (10) (numeric, a.u.) how many noise st-devs
+%       above zero must spike amplitudes be? Uses mean cluster amplitude to
+%       detect "no spike" trials (doesn't filter out individual spikes this
+%       way). Be very careful of setting this too high.
 %   
 %   Clusters peak waveforms into 2 clusters using k-means. Based on three
 %   quantities about each spike waveform: amplitude of the peak, amlitude
 %   of a rebound on the right and left.
 %   MHT 9.23.2016 - Ported over from personal version
+%   MHT 1.25.2017 - Added option to remove refractory violation spike times
 
 ip = inputParser;
 ip.addRequired('DataMatrix',@ismatrix);
@@ -27,6 +34,9 @@ addParameter(ip,'CheckDetection',false,@islogical);
 addParameter(ip,'SampleRate',1e4,@isnumeric);
 addParameter(ip,'RefractoryPeriod',1.5E-3,@isnumeric);
 addParameter(ip,'SearchWindow',1.2E-3,@isnumeric);
+addParameter(ip,'RemoveRefractoryViolations',true,@islogical);
+addParameter(ip,'thresholdSpikeFactor',10,@isnumeric); 
+
     
 ip.parse(DataMatrix,varargin{:});
 DataMatrix = ip.Results.DataMatrix;
@@ -34,6 +44,8 @@ CheckDetection = ip.Results.CheckDetection;
 SampleRate = ip.Results.SampleRate;
 RefractoryPeriod = ip.Results.RefractoryPeriod * SampleRate; % datapoints
 SearchWindow = ip.Results.SearchWindow * SampleRate; % datapoints
+RemoveRefractoryViolations = ip.Results.RemoveRefractoryViolations;
+thresholdSpikeFactor = ip.Results.thresholdSpikeFactor;
 
 CutoffFrequency = 500; %Hz
 DataMatrix = highPassFilter(DataMatrix,CutoffFrequency,1/SampleRate);
@@ -44,8 +56,7 @@ SpikeAmplitudes = cell(nTraces,1);
 RefractoryViolations = cell(nTraces,1);
 
 if (CheckDetection)
-    figure;
-    figHandle = gcf;
+    figHandle = figure(40);
 end
 
 for tt=1:nTraces
@@ -89,11 +100,15 @@ for tt=1:nTraces
     %how many st-devs greater is spike peak than noise peak?
     sigF = (mean(SpikeAmplitudes{tt}) - mean(nonspikeAmplitudes)) / std(nonspikeAmplitudes);
     
-    if sigF < 5; %no spikes
+    if sigF < thresholdSpikeFactor; %no spikes
         SpikeTimes{tt} = [];
         SpikeAmplitudes{tt} = []; 
         RefractoryViolations{tt} = [];
-%         disp(['Trial '  num2str(tt) ': no spikes!']);
+        disp(['Trial '  num2str(tt) ': no spikes. SF = ',num2str(sigF)]);
+
+% %         figHandle = figure(40);
+% %         plotClusteringData();
+
         if (CheckDetection)
             plotClusteringData();
         end
@@ -104,11 +119,23 @@ for tt=1:nTraces
     RefractoryViolations{tt} = find(diff(SpikeTimes{tt}) < RefractoryPeriod) + 1;
     ref_violations = length(RefractoryViolations{tt});
     if ref_violations > 0
-        disp(['Trial '  num2str(tt) ': ' num2str(ref_violations) ' refractory violations']);
+% %         figHandle = figure(40);
+% %         plotClusteringData()
+        if (RemoveRefractoryViolations)
+            disp(['Trial '  num2str(tt) ': ' num2str(ref_violations) ' refractory violations removed']);
+        else
+            disp(['Trial '  num2str(tt) ': ' num2str(ref_violations) ' refractory violations remain']);
+        end
     end
 
     if (CheckDetection)
         plotClusteringData()
+    end
+end
+if (RemoveRefractoryViolations)
+    for tt = 1:length(SpikeTimes)
+        SpikeTimes{tt}(RefractoryViolations{tt}) = [];
+        SpikeAmplitudes{tt}(RefractoryViolations{tt}) = [];
     end
 end
 
