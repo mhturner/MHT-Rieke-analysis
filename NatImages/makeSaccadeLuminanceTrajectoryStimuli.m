@@ -1,4 +1,5 @@
-%2016082616
+%20160826 - uses DOVES data to create measured eye movement luminance
+%trajectories
 
 IMAGES_DIR            = '~/Documents/MATLAB/MHT-analysis-package/resources/Doves/Images/';
 FIXATIONS_DIR = '~/Documents/MATLAB/MHT-analysis-package/resources/Doves/Fixations/';
