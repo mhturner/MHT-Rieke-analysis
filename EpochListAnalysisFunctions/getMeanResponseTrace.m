@@ -85,9 +85,9 @@ function response = getMeanResponseTrace(epochList,recordingType,varargin)
         baselines = mean(dataMatrix(:,1:baselinePoints),2); %baseline for each trial
         baselineSubtracted = dataMatrix - repmat(baselines,1,size(dataMatrix,2));
         if ~isempty(strfind(recordingType,'conductance')) %estimate conductance, nS
-            if strcmp(recordingType,'exc')
+            if strcmp(recordingType,'exc, conductance')
                 DF = -60; %mV
-            elseif strcmp(recordingType,'inh')
+            elseif strcmp(recordingType,'inh, conductance')
                 DF = 60; %mV
             end
             baselineSubtracted = baselineSubtracted ./ DF;
