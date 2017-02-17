@@ -89,7 +89,13 @@ function res = getNoiseStimulusAndResponse(epoch,recordingType,varargin)
     stimTime = epoch.protocolSettings('stimTime'); %msec
     frameDwell = epoch.protocolSettings('frameDwell');
     lightCrafterFlag = epoch.protocolSettings.keySet.contains('background:LightCrafter Stage@localhost:lightCrafterPatternRate');
+    if ~lightCrafterFlag
+        lightCrafterFlag = epoch.protocolSettings.keySet.contains('background:LightCrafter_Stage@localhost:lightCrafterPatternRate');
+    end
     frameRate = epoch.protocolSettings('background:Microdisplay Stage@localhost:monitorRefreshRate');
+    if isempty(frameRate)
+        frameRate = epoch.protocolSettings('background:Microdisplay_Stage@localhost:monitorRefreshRate');
+    end
     FMdata = (riekesuite.getResponseVector(epoch,'Frame Monitor'))';
     frameTimes = getFrameTiming(FMdata,lightCrafterFlag);
     %trim data to stim size:

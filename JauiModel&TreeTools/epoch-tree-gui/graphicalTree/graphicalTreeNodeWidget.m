@@ -76,13 +76,12 @@ classdef graphicalTreeNodeWidget < handle
             self.drawIndex = drawCount;
             node = self.tree.nodeList.getValue(self.boundNodeKey);
             self.setPositions(drawCount, node.depth);
-            
-            %GWS hack: set display stuff
-%             displayMap = node.userData.custom.get('display');
-%             node.name = displayMap.get('name');
-%             node.textColor = displayMap.get('color');
-%             node.textBackgroundColor = displayMap.get('backgroundColor');
-            
+
+            if ischar(node.name)
+                
+            else
+                node.name = 'null';
+            end
             set(self.nameText, ...
                 'String', node.name, ...
                 'Color', node.textColor, ...
