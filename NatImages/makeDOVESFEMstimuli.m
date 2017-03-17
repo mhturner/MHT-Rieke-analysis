@@ -1,7 +1,7 @@
 %makeDOVESFEMstimuli
 %011516
-IMAGES_DIR            = '~/Documents/MATLAB/MHT-analysis-package/resources/Doves/Images/';
-FIXATIONS_DIR = '~/Documents/MATLAB/MHT-analysis-package/resources/Doves/Fixations/';
+IMAGES_DIR            = '~/Documents/MATLAB/MHT-analysis/resources/Doves/Images/';
+FIXATIONS_DIR = '~/Documents/MATLAB/MHT-analysis/resources/Doves/Fixations/';
 temp_names                  = GetFilenames(IMAGES_DIR,'.iml');	
 for file_num = 1:size(temp_names,1)
     temp                    = temp_names(file_num,:);

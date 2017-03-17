@@ -14,10 +14,12 @@ function response = getMeanResponseTrace(epochList,recordingType,varargin)
     ip.addRequired('epochList',@(x)isa(x,'edu.washington.rieke.symphony.generic.GenericEpochList'));
     ip.addRequired('recordingType',@ischar);
     addParameter(ip,'PSTHsigma',5,@isnumeric); %msec
+    addParameter(ip,'attachSpikeBinary',false,@islogical); %output field for extracellular only
     ip.parse(epochList,recordingType,varargin{:});
     epochList = ip.Results.epochList;
     recordingType = ip.Results.recordingType;
     PSTHsigma = ip.Results.PSTHsigma;
+    attachSpikeBinary = ip.Results.attachSpikeBinary;
 
     sampleRate = epochList.firstValue.protocolSettings('sampleRate'); %Hz
     baselineTime = epochList.firstValue.protocolSettings('preTime'); %msec
@@ -45,11 +47,13 @@ function response = getMeanResponseTrace(epochList,recordingType,varargin)
                 PSTH(ss,:) =  sampleRate*conv(spikeBinary(ss,:),newFilt.amp,'same');
             end
         end
-        
         response.mean = mean(PSTH,1);
         response.stdev = std(PSTH,[],1);
         response.SEM = response.stdev ./ sqrt(response.n);
         response.units = 'Spikes/sec';
+        if (attachSpikeBinary)
+            response.binary = spikeBinary;
+        end
 
     elseif strcmp(recordingType,'iClamp, spikes')
         [SpikeTimes, ~]...
