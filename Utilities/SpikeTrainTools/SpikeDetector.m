@@ -106,8 +106,8 @@ for tt=1:nTraces
         RefractoryViolations{tt} = [];
         disp(['Trial '  num2str(tt) ': no spikes. SF = ',num2str(sigF)]);
 
-% %         figHandle = figure(40);
-% %         plotClusteringData();
+%         figHandle = figure(40);
+%         plotClusteringData();
 
         if (CheckDetection)
             plotClusteringData();

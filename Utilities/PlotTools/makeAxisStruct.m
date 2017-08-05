@@ -1,6 +1,6 @@
 function [] = makeAxisStruct(ax, fname, varargin)
 disp(fname);
-basedir = '~/Dropbox/MyStuff/Matlab2Igor/FigFiles/';
+basedir = '~/Dropbox/MyStuff/RiekeLab/Analysis/Matlab2Igor/FigFiles/';
 if ~isempty(varargin)
     basedir=[basedir varargin{1} '/'];
 end
