@@ -1,6 +1,10 @@
-function binAndPlotPopulationData(allX, allY, binning, figureHandle)
-    % binAndPlotPopulationData(allX, allY, binning, figureHandle)
+function binAndPlotPopulationData(allX, allY, binning, figureHandle, plotColor)
+    % binAndPlotPopulationData(allX, allY, binning, figureHandle, plotColor)
     % Binning is either a) number of bins or b) defined bin edges
+    
+    if (nargin < 5)
+        plotColor = 'k';
+    end
 if length(binning) > 1
     binEdges = binning;
     noBins = length(binEdges) - 1;
@@ -28,13 +32,13 @@ for bb = 1:noBins
     
     addLineToAxis([XX.mean(bb) - XX.err(bb),  XX.mean(bb) + XX.err(bb)],...
         [YY.mean(bb), YY.mean(bb)],...
-        ['errX',num2str(bb)],figureHandle,'k','-','none')
+        ['errX',num2str(bb)],figureHandle,plotColor,'-','none')
     
     addLineToAxis([XX.mean(bb),  XX.mean(bb)],...
         [YY.mean(bb) - YY.err(bb), YY.mean(bb) + YY.err(bb)],...
-        ['errY',num2str(bb)],figureHandle,'k','-','none')
+        ['errY',num2str(bb)],figureHandle,plotColor,'-','none')
 end
 
 addLineToAxis(XX.mean,YY.mean,...
-    'meanXY',figureHandle,'k','-','o')
+    'meanXY',figureHandle,plotColor,'-','o')
 end

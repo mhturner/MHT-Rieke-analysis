@@ -13,7 +13,7 @@ function res = getNaturalImagePatchFromLocation(patchLocations,imageName,varargi
     stimSet = ip.Results.stimSet;
 
     %load appropriate image...
-    resourcesDir = '~/Documents/MATLAB/turner-package/resources';
+    resourcesDir = '~/Dropbox/RiekeLab/Analysis/MATLAB/turner-package/resources';
     fileId=fopen([resourcesDir, stimSet, '/imk', imageName,'.iml'],'rb','ieee-be');
     img = fread(fileId, [1536,1024], 'uint16');
 

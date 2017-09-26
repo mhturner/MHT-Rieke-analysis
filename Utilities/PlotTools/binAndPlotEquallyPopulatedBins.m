@@ -1,8 +1,9 @@
-function binAndPlotEquallyPopulatedBins(allX, allY, numberOfBins, figureHandle, plotColor)
-    % binAndPlotEquallyPopulatedBins(allX, allY, numberOfBins, figureHandle, plotColor)
+function binAndPlotEquallyPopulatedBins(allX, allY, numberOfBins, figureHandle, plotColor, lineBaseTag)
+    % binAndPlotEquallyPopulatedBins(allX, allY, numberOfBins, figureHandle, plotColor, lineBaseTag)
     
     if (nargin < 5)
         plotColor = 'k';
+        lineBaseTag = '';
     end
     
 [n,binMean,binSTD,binID] = histcounts_equallyPopulatedBins(allX,numberOfBins);
@@ -19,13 +20,13 @@ for bb = 1:numberOfBins
     
     addLineToAxis([XX.mean(bb) - XX.err(bb),  XX.mean(bb) + XX.err(bb)],...
         [YY.mean(bb), YY.mean(bb)],...
-        ['errX',num2str(bb)],figureHandle,plotColor,'-','none')
+        [lineBaseTag,'errX',num2str(bb)],figureHandle,plotColor,'-','none')
     
     addLineToAxis([XX.mean(bb),  XX.mean(bb)],...
         [YY.mean(bb) - YY.err(bb), YY.mean(bb) + YY.err(bb)],...
-        ['errY',num2str(bb)],figureHandle,plotColor,'-','none')
+        [lineBaseTag,'errY',num2str(bb)],figureHandle,plotColor,'-','none')
 end
 
 addLineToAxis(XX.mean,YY.mean,...
-    'meanXY',figureHandle,plotColor,'-','o')
+    [lineBaseTag,'meanXY'],figureHandle,plotColor,'-','o')
 end
