@@ -5,6 +5,7 @@ classdef epochTreeGUI < handle
         showEpochs = true;
         figure;
         isBusy = false;
+        showImagingTraces = false;
         
     end
     
@@ -122,7 +123,7 @@ classdef epochTreeGUI < handle
             self.fontSize = fontSize;
             self.rebuildUIComponents;
         end
-        
+
         %%% tree browser
         
         function buildTreeBrowserUI(self)
@@ -453,7 +454,11 @@ classdef epochTreeGUI < handle
         function plotEpochData(self)
             self.isBusy = true;
             nodes = self.getSelectedEpochTreeNodes;
-            singleEpoch(nodes{1}, self.plottingCanvas.panel, 0)
+            if (self.showImagingTraces)
+                singleEpochPlusImagingTraces(nodes{1}, self.plottingCanvas.panel, 0)
+            else
+                singleEpoch(nodes{1}, self.plottingCanvas.panel, 0)
+            end
             self.isBusy = false;
         end
         
