@@ -1,5 +1,4 @@
 function [] = makeAxisStruct(ax, fname, varargin)
-disp(fname);
 basedir = '~/Dropbox/RiekeLab/Analysis/Matlab2Igor/FigFiles/';
 if ~isempty(varargin)
     basedir=[basedir varargin{1} '/'];
@@ -138,3 +137,4 @@ if isempty(fname)
 end
 exportStructToHDF5(s,[fname '.h5'],fname,options);
 movefile([fname '.h5'], [basedir fname '.h5']);
+disp(fname);
